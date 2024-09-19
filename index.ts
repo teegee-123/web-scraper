@@ -1,5 +1,9 @@
-const express = require("express");
-const { scrapeLogic } = require("./scrapeLogic");
+import express from "express";
+import { scrapeLogic } from "./scrapeLogic";
+
+
+
+
 const app = express();
 
 const PORT = process.env.PORT || 4000;
