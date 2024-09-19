@@ -9,7 +9,7 @@ const PUPPETEER_EXECUTABLE_PATH = process.env.PUPPETEER_EXECUTABLE_PATH ?? puppe
 export const scrapeLogic = async (res) => {
   console.log(NODE_ENV)
   const browser = await puppeteer.launch({
-    headless: false, // NODE_ENV === "production",
+    headless: true, // NODE_ENV === "production",
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
