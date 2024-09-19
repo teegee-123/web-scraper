@@ -9,6 +9,6 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npx tsc
-RUN ls
-CMD [ "npm", "start1" ]
+RUN dir
+CMD [ "node", "dist/index.js" ]
 
