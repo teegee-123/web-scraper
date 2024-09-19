@@ -10,5 +10,5 @@ RUN npm ci
 COPY . .
 RUN npx tsc
 RUN ls
-CMD [ "node", "dist/index.js" ]
+CMD [ "npm", "start1" ]
 
