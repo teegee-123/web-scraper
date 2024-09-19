@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 RUN npm run build
+RUN dir
 COPY . .
-CMD [ "node", "dist/index.js" ]
+CMD [ "npm", "start" ]
 
