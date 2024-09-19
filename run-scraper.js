@@ -8,14 +8,15 @@ const runScraper = async (res) =>  {
     const browser = await puppeteer.launch({
         // headless: false,
         args:[
-            // '--no-sandbox',
+            '--no-sandbox',
             '--disable-setui-sandbox',
             '--single-process',
             '--no-zygote'
         ],
-        executablePath: process.env.NODE_ENV==="production" ? 
+        executablePath: '/usr/bin/google-chrome-stable'
+                        /*process.env.NODE_ENV==="production" ? 
                         process.env.PUPPETEER_EXECUTABLE_PATH : 
-                        puppeteer.executablePath(),
+                        puppeteer.executablePath(),*/
     });
     try{
 
