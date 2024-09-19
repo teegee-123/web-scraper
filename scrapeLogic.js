@@ -25,8 +25,6 @@ const scrapeLogic = async (res) => {
     let element = await page.$('.devsite-landing-row-description')
     let value = await page.evaluate(el => el.textContent, element)
     res.send(value)
-
-    res.send(logStatement);
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
