@@ -2,9 +2,9 @@ const puppeteer = require('puppeteer')
 require('dotenv').config()
 
 const runScraper = async (res) =>  {    
-    console.log(process.env.NODE_ENV)
-    console.log(process.env.PUPPETEER_EXECUTABLE_PATH)
-    console.log(puppeteer.executablePath())
+    console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+    console.log('process.env.PUPPETEER_EXECUTABLE_PATH', process.env.PUPPETEER_EXECUTABLE_PATH)
+    console.log('puppeteer.executablePath', puppeteer.executablePath())
     const browser = await puppeteer.launch({
         // headless: false,
         args:[
