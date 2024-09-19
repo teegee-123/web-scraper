@@ -10,5 +10,5 @@ RUN npm ci
 RUN npm run build
 RUN dir
 COPY . .
-CMD [ "npm", "start" ]
+CMD [ "node", "dist/index.js" ]
 
