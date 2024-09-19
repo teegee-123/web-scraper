@@ -2,10 +2,13 @@ const puppeteer = require('puppeteer')
 require('dotenv').config()
 
 const runScraper = async (res) =>  {    
+    console.log(process.env.NODE_ENV==="production" ? 
+        process.env.PUPPETEER_EXECUTABLE_PATH : 
+        puppeteer.executablePath())
     const browser = await puppeteer.launch({
-        // headless: false
+        // headless: false,
         args:[
-            '--no-sandbox',
+            // '--no-sandbox',
             '--disable-setui-sandbox',
             '--single-process',
             '--no-zygote'
