@@ -47,7 +47,15 @@ app.listen(PORT, async () => {
                   x.isLive === IS_LIVE
           });
           sendData.forEach(async m => {          
-            await bot.sendMessage(msg.chat.id, JSON.stringify(m, null, 4), {reply_to_message_id: msg.message_id})
+            await bot.sendMessage(msg.chat.id, `
+                *Address: *\`${m.address}\`
+              *MC: *${m.marketCap}
+              *Age: *${m.age}
+              *Read Time: *${m.readTime}
+              *Replies: *${m.replies}
+              `,
+              
+               {reply_to_message_id: msg.message_id, parse_mode: 'Markdown'})
           })
           if(!sendData.length) {
             await bot.sendMessage(msg.chat.id, "No data found for parameters", {reply_to_message_id: msg.message_id})
