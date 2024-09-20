@@ -33,7 +33,7 @@ app.listen(PORT, async () => {
     
     console.log(msg)
     console.log(IS_LIVE)
-    if(msg.text?.toLowerCase()==="list"){
+    if(msg.text?.toLowerCase()==="/list"){
       const data = await runScraper()
       
       if(typeof(data) === 'string') {
