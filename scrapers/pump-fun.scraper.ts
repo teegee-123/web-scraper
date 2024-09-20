@@ -1,7 +1,8 @@
-import { Browser, Page } from "puppeteer";
 import { Scraper } from "./scraper";
 import { Util } from "./util";
-
+import TelegramBot from 'node-telegram-bot-api'
+require('dotenv').config()
+const token = process.env.BOT_TOKEN
 export class PumpFunScraper extends Scraper {
     READY_TO_PUMP_BUTTON_SELECTOR = 'button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text-sm.font-medium.ring-offset-white.transition-colors'
     PAGE_READY_SELECTOR = 'a:nth-child(10)'
@@ -10,14 +11,14 @@ export class PumpFunScraper extends Scraper {
     }
 
     public override async scrape(): Promise<PumpFunData[]> {
-     
         await this.init();   
         if(await this.elementExists(this.READY_TO_PUMP_BUTTON_SELECTOR)){
             await this.page.click(this.READY_TO_PUMP_BUTTON_SELECTOR)
         }        
 
         await this.page.waitForSelector(this.PAGE_READY_SELECTOR)
-        const data = await this.page.$$eval('a[href^="/"]',  links => links.filter(x =>  x.classList.length===0).map(x => {return {html: x.innerHTML, text: x.innerText, href: x.href}}));
+        const data = await this.page.$$eval('a[href^="/"]', 
+            links => links.filter(x =>  x.classList.length===0).map(x => {return {html: x.innerHTML, text: x.innerText, href: x.href}}));
         const d: PumpFunData[] =  data.filter(x => !!x.text && (x.href.length === 61 ||x.href.length === 62)).map(x => {
             return{
                 originalText: x.text,
@@ -26,8 +27,12 @@ export class PumpFunScraper extends Scraper {
                 marketCap: this.readMarketCap(x.text),
                 age: this.readAge(x.text),
                 replies: this.readReplies(x.text),
-                isLive: x.text.startsWith('Currently live streaming!')
+                isLive: x.text.startsWith('Currently live streaming!'),
+                readTime: new Date()
             }
+        })
+        d.forEach(a => {
+            // telegram.
         })
         return d
     }
@@ -58,4 +63,5 @@ export interface PumpFunData {
     age: number; 
     replies: number; 
     isLive: boolean; 
+    readTime: Date
 }
