@@ -9,7 +9,7 @@ export class PumpFunScraper extends Scraper {
         return href.slice(-1)[0]
     }
 
-    public override async scrape() {
+    public override async scrape(): Promise<PumpFunData[]> {
      
         await this.init();   
         if(await this.elementExists(this.READY_TO_PUMP_BUTTON_SELECTOR)){
@@ -18,7 +18,7 @@ export class PumpFunScraper extends Scraper {
 
         await this.page.waitForSelector(this.PAGE_READY_SELECTOR)
         const data = await this.page.$$eval('a[href^="/"]',  links => links.filter(x =>  x.classList.length===0).map(x => {return {html: x.innerHTML, text: x.innerText, href: x.href}}));
-        const d =  data.filter(x => !!x.text && (x.href.length === 61 ||x.href.length === 62)).map(x => {
+        const d: PumpFunData[] =  data.filter(x => !!x.text && (x.href.length === 61 ||x.href.length === 62)).map(x => {
             return{
                 originalText: x.text,
                 address: x.href.split("/").slice(-1)[0],
@@ -47,4 +47,15 @@ export class PumpFunScraper extends Scraper {
         const replies = text.split("\n").find(x => x.includes("replies: "));        
         return parseInt(replies.replace("replies: ", "") ?? '0');
     }
+}
+
+
+export interface PumpFunData { 
+    originalText: string; 
+    address: string; 
+    name: string; 
+    marketCap: number; 
+    age: number; 
+    replies: number; 
+    isLive: boolean; 
 }

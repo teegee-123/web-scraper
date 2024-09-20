@@ -18,5 +18,5 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`);
-  await runScraper()
+  // await runScraper()
 });

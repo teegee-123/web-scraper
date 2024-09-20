@@ -1,12 +1,10 @@
-import { Page } from 'puppeteer';
 import puppeteer from 'puppeteer';
-import { Scraper } from './scrapers/scraper';
-import { PumpFunScraper } from './scrapers/pump-fun.scraper';
+import { PumpFunData, PumpFunScraper } from './scrapers/pump-fun.scraper';
 require("dotenv").config();
 const NODE_ENV = process.env.NODE_ENV ?? 'dev'
 const PUPPETEER_EXECUTABLE_PATH = process.env.PUPPETEER_EXECUTABLE_PATH ?? puppeteer.executablePath()
 
-export const runScraper = async (): Promise<string> => {
+export const runScraper = async (): Promise<PumpFunData[]| string> => {
   console.log(NODE_ENV)
   const browser = await puppeteer.launch({
     headless: NODE_ENV === "production",
@@ -23,7 +21,7 @@ export const runScraper = async (): Promise<string> => {
   try {
     const scraper = new PumpFunScraper(browser, "https://pump.fun/board")
     const data = await scraper.scrape()
-
+    return data
   } catch (e) {
     console.error(e);
     return `ERROR ${e}`
