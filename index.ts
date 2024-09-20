@@ -6,7 +6,6 @@ import { PumpFunData } from "./scrapers/pump-fun.scraper";
 const app = express();
 
 const PORT = process.env.PORT || 4000;
-const FEED_ID = process.env.FEED_ID
 const MAX_AGE = parseInt(process.env.MAX_AGE)
 const MAX_MARKET_CAP = parseInt(process.env.MAX_MARKET_CAP)
 const MIN_REPLIES = parseInt(process.env.MIN_REPLIES)
@@ -30,14 +29,15 @@ app.listen(PORT, async () => {
   }
   await bot.startPolling({restart: true})
 
-  await bot.sendMessage(FEED_ID, `Started ${new Date()}`)
   bot.on('message', async (msg, meta) => {
-    console.log(msg.text)
+    
+    console.log(msg)
     console.log(IS_LIVE)
-    if(msg.text.toLowerCase()==="list"){
+    if(msg.text?.toLowerCase()==="list"){
       const data = await runScraper()
+      
       if(typeof(data) === 'string') {
-        await bot.sendMessage(FEED_ID, `ERROR ${data}`)
+        await bot.sendMessage(msg.chat.id, `ERROR ${data}`, {reply_to_message_id: msg.message_id})
       } else {
         const sendData  = (data as PumpFunData[]).filter(x => {
           return x.age <= MAX_AGE && 
@@ -46,10 +46,10 @@ app.listen(PORT, async () => {
                 x.isLive === IS_LIVE
         });
         sendData.forEach(async m => {          
-          await bot.sendMessage(FEED_ID, JSON.stringify(m, null, 4))
+          await bot.sendMessage(msg.chat.id, JSON.stringify(m, null, 4), {reply_to_message_id: msg.message_id})
         })
         if(!sendData.length) {
-          await bot.sendMessage(FEED_ID, "No data found for parameters")
+          await bot.sendMessage(msg.chat.id, "No data found for parameters", {reply_to_message_id: msg.message_id})
         }
     }
     
