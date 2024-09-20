@@ -39,17 +39,23 @@ app.listen(PORT, async () => {
       if(typeof(data) === 'string') {
         await bot.sendMessage(msg.chat.id, `ERROR ${data}`, {reply_to_message_id: msg.message_id})
       } else {
-        const sendData  = (data as PumpFunData[]).filter(x => {
-          return x.age <= MAX_AGE && 
-                x.marketCap <= MAX_MARKET_CAP && 
-                x.replies > MIN_REPLIES &&
-                x.isLive === IS_LIVE
-        });
-        sendData.forEach(async m => {          
-          await bot.sendMessage(msg.chat.id, JSON.stringify(m, null, 4), {reply_to_message_id: msg.message_id})
-        })
-        if(!sendData.length) {
-          await bot.sendMessage(msg.chat.id, "No data found for parameters", {reply_to_message_id: msg.message_id})
+        try{
+          const sendData  = (data as PumpFunData[]).filter(x => {
+            return x.age <= MAX_AGE && 
+                  x.marketCap <= MAX_MARKET_CAP && 
+                  x.replies > MIN_REPLIES &&
+                  x.isLive === IS_LIVE
+          });
+          sendData.forEach(async m => {          
+            await bot.sendMessage(msg.chat.id, JSON.stringify(m, null, 4), {reply_to_message_id: msg.message_id})
+          })
+          if(!sendData.length) {
+            await bot.sendMessage(msg.chat.id, "No data found for parameters", {reply_to_message_id: msg.message_id})
+          }
+        } catch(e) {
+          await bot.sendMessage(msg.chat.id, `Error ${e}`, {reply_to_message_id: msg.message_id})
+        } finally {
+          await bot.sendMessage(msg.chat.id, `Done`, {reply_to_message_id: msg.message_id})
         }
     }
     
