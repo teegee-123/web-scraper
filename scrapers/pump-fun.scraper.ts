@@ -39,7 +39,7 @@ export class PumpFunScraper extends Scraper {
                     x.replies > params.MIN_REPLIES &&
                     x.isLive === params.IS_LIVE
             })
-
+        await this.page.close()
         return scrapedData
     }
 

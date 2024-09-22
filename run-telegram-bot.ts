@@ -33,11 +33,12 @@ export class BotManager{
                 // message is formatted as MAX_AGE MAX_MARKET_CAP MIN_REPLIES IS_LIVE
                 const args = msg.text.split(" ")
                 const params = {
-                    MAX_AGE: args[1] ?? 600,
-                    MAX_MARKET_CAP: args[2] ?? 5000,
-                    MIN_REPLIES: args[3] ?? 0,
-                    IS_LIVE: args[4] ?? false,
+                    MAX_AGE: this.readArgNumber(args[1], 600),
+                    MAX_MARKET_CAP: this.readArgNumber(args[2], 5000),
+                    MIN_REPLIES: this.readArgNumber(args[3], 0),
+                    IS_LIVE: !!args[4],
                 }
+                console.log(params)
                 const data = await this.browserManager.tryScrape(
                     new PumpFunScraper(this.browserManager.browser, 'https://pump.fun/board'),
                     params
@@ -49,10 +50,17 @@ export class BotManager{
                     data.forEach(async pumpItem => {
                         await this.bot.sendMessage(msg.chat.id, pumpItem.to_message(), {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                     })
+                    await this.bot.sendMessage(msg.chat.id, `*Done*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                 }
-                await this.bot.sendMessage(msg.chat.id, `*Done*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
             }
 
       })
+    }
+
+    private readArgNumber(arg: string | undefined | null, defaultValue: number){
+        if(!arg || (arg && isNaN(parseInt(arg)))) {
+            return defaultValue
+        }
+        return parseInt(arg)
     }
 }

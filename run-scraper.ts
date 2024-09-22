@@ -45,27 +45,8 @@ export class BrowserManager {
         } catch(e) {
           return `ERROR ${e}`
         } finally {
-
+          
         }
     }
 }
 
-
-// const bot = new TelegramBot(process.env.BOT_TOKEN)
-// export const runScraper = async (): Promise<PumpFunData[] | string> => {
-//   console.log(NODE_ENV)
- 
-
-//   try {
-//     const scraper = new PumpFunScraper(browser, "https://pump.fun/board")    
-//     const data = await scraper.scrape()    
-//     return data
-//   } catch (e) {
-//     console.error(e);
-//     return `ERROR ${e}`
-//   } finally {
-//     await browser.close();
-//   }
-// };
-
-// module.exports = { runScraper: runScraper };

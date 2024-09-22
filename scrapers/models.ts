@@ -14,14 +14,14 @@ export class PumpFunData implements ScraperData {
     isLive: boolean; 
 
     to_message() {
-        return `*readTime*: ${this.readTime}
-            *originalText*: ${this.originalText}
+        return `
             *address*: \`${this.address}\`
             *name*: ${this.name}
-            *marketCap*: ${this.marketCap}
             *age*: ${this.age}
+            *marketCap*: ${this.marketCap}
             *replies*: ${this.replies}
-            *isLive*: ${this.isLive}`
-
+            *isLive*: ${this.isLive}
+            *readTime*: ${this.readTime}
+            *originalText*: ${this.originalText}`
     }   
 }
