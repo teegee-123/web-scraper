@@ -22,7 +22,7 @@ export abstract class Scraper {
         return element !== ""
     }
 
-    public abstract scrape();
+    public abstract scrape(params?: any);
     
 }
 

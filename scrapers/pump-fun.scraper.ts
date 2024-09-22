@@ -1,6 +1,6 @@
+import { PumpFunData } from "./models";
 import { Scraper } from "./scraper";
 import { Util } from "./util";
-import TelegramBot from 'node-telegram-bot-api'
 require('dotenv').config()
 const token = process.env.BOT_TOKEN
 export class PumpFunScraper extends Scraper {
@@ -10,7 +10,7 @@ export class PumpFunScraper extends Scraper {
         return href.slice(-1)[0]
     }
 
-    public override async scrape(): Promise<PumpFunData[]> {
+    public override async scrape(params: any = null): Promise<PumpFunData[]> {
         await this.init();   
         if(await this.elementExists(this.READY_TO_PUMP_BUTTON_SELECTOR)){
             await this.page.click(this.READY_TO_PUMP_BUTTON_SELECTOR)
@@ -19,22 +19,28 @@ export class PumpFunScraper extends Scraper {
         await this.page.waitForSelector(this.PAGE_READY_SELECTOR)
         const data = await this.page.$$eval('a[href^="/"]', 
             links => links.filter(x =>  x.classList.length===0).map(x => {return {html: x.innerHTML, text: x.innerText, href: x.href}}));
-        const d: PumpFunData[] =  data.filter(x => !!x.text && (x.href.length === 61 ||x.href.length === 62)).map(x => {
-            return{
-                originalText: x.text,
-                address: x.href.split("/").slice(-1)[0],
-                name: x.text.split("\n").slice(-1)[0],
-                marketCap: this.readMarketCap(x.text),
-                age: this.readAge(x.text),
-                replies: this.readReplies(x.text),
-                isLive: x.text.startsWith('Currently live streaming!'),
-                readTime: new Date()
-            }
-        })
-        d.forEach(a => {
-            // telegram.
-        })
-        return d
+        const scrapedData: PumpFunData[] =  data
+            .filter(x => !!x.text && (x.href.length === 61 ||x.href.length === 62))
+            .map(x => {
+                const data = new PumpFunData();
+                data.originalText = x.text;
+                data.address = x.href.split("/").slice(-1)[0];
+                data.name = x.text.split("\n").slice(-1)[0];
+                data.marketCap = this.readMarketCap(x.text);
+                data.age = this.readAge(x.text);
+                data.replies = this.readReplies(x.text);
+                data.isLive = x.text.startsWith('Currently live streaming!');
+                data.readTime = new Date();
+                return data;
+            })
+            .filter(x => {
+                return x.age <= params.MAX_AGE && 
+                    x.marketCap <= params.MAX_MARKET_CAP && 
+                    x.replies > params.MIN_REPLIES &&
+                    x.isLive === params.IS_LIVE
+            })
+
+        return scrapedData
     }
 
     readMarketCap(text: string) {
@@ -52,16 +58,4 @@ export class PumpFunScraper extends Scraper {
         const replies = text.split("\n").find(x => x.includes("replies: "));        
         return parseInt(replies.replace("replies: ", "") ?? '0');
     }
-}
-
-
-export interface PumpFunData { 
-    originalText: string; 
-    address: string; 
-    name: string; 
-    marketCap: number; 
-    age: number; 
-    replies: number; 
-    isLive: boolean; 
-    readTime: Date
 }
