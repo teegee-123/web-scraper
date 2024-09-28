@@ -44,7 +44,7 @@ export class BotManager {
                     IS_LIVE: !!args[4],
                 }
                 console.log(params)
-                const data = await this.browserManager.tryScrape(
+                let data = await this.browserManager.tryScrape(
                     new PumpFunScraper(this.browserManager.browser, 'https://pump.fun/board'),
                     params
                 ) as PumpFunData[] | string
@@ -52,8 +52,12 @@ export class BotManager {
                     await this.bot.sendMessage(msg.chat.id, `*Error: *${data}`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })    
                 }
                 else {
-                    if(this.maxAmountOfTradesToSend >= 0)
-                        data.splice(this.maxAmountOfTradesToSend)
+                    try {
+                        if(this.maxAmountOfTradesToSend >= 0)
+                            data.splice(this.maxAmountOfTradesToSend)
+                    } catch(e) {
+                        console.log("ERROR: ", e)
+                    }
                     data.forEach(async pumpItem => {
                         await this.bot.sendMessage(msg.chat.id, pumpItem.to_message(), {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                     })
