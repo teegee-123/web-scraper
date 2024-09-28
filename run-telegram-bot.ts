@@ -52,25 +52,34 @@ export class BotManager {
                     await this.bot.sendMessage(msg.chat.id, `*Error: *${data}`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })    
                 }
                 else {
+                    let skipped = []
                     try {
-                        if(this.maxAmountOfTradesToSend >= 0)
-                            data.splice(this.maxAmountOfTradesToSend)
+                        if(this.maxAmountOfTradesToSend >= 0){
+                            skipped = data.splice(this.maxAmountOfTradesToSend)
+                        }
+                        data.forEach(async pumpItem => {
+                            await this.bot.sendMessage(msg.chat.id, pumpItem.to_message(), {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                        })
+                        await this.bot.sendMessage(msg.chat.id, `Done skipped *${skipped.length} items*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                     } catch(e) {
                         console.log("ERROR: ", e)
+                        await this.bot.sendMessage(msg.chat.id, `Error *${e}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                     }
-                    data.forEach(async pumpItem => {
-                        await this.bot.sendMessage(msg.chat.id, pumpItem.to_message(), {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
-                    })
-                    await this.bot.sendMessage(msg.chat.id, `*Done*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                    
                 }
             }
             if(msg.text?.toLowerCase().startsWith('/set')) {
                 const args = msg.text.split(" ")
                 const numberOfTrades = this.readArgNumber(args[1], 0)
-                console.log(`Currently there are ${numberOfTrades} trades`)
+                console.log(`SET Currently there are ${numberOfTrades} trades`)
                 this.numberOfTrades = numberOfTrades
-                await this.bot.sendMessage(msg.chat.id, `Currently there are *${numberOfTrades}* trades, pump will send at most *${this.maxAmountOfTradesToSend}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                await this.bot.sendMessage(msg.chat.id, `Currently there are *${numberOfTrades}* trades, scraper will send at most *${this.maxAmountOfTradesToSend}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
             }            
+            if(msg.text?.toLowerCase().startsWith('/get')) {
+                console.log(`GET Currently there are ${this.numberOfTrades} trades`)                
+                await this.bot.sendMessage(msg.chat.id, `Currently there are *${this.numberOfTrades}* trades, scraper will send at most *${this.maxAmountOfTradesToSend}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+            }            
+
       })
     }
 
