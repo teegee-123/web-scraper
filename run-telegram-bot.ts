@@ -4,12 +4,17 @@ import { BrowserManager } from "./run-scraper"
 import { PumpFunScraper } from "./scrapers/pump-fun.scraper"
 
 
-export class BotManager{
+export class BotManager {
     bot: TelegramBot
     browserManager: BrowserManager
+    numberOfTrades: number = 0
     constructor(browserManager: BrowserManager) {
         this.bot = new TelegramBot(process.env.BOT_TOKEN)
         this.browserManager = browserManager
+    }
+
+    get maxAmountOfTradesToSend(): number {
+        return 8 - this.numberOfTrades;
     }
     
     async startListeners(){
@@ -47,13 +52,21 @@ export class BotManager{
                     await this.bot.sendMessage(msg.chat.id, `*Error: *${data}`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })    
                 }
                 else {
+                    if(this.maxAmountOfTradesToSend >= 0)
+                        data.splice(this.maxAmountOfTradesToSend)
                     data.forEach(async pumpItem => {
                         await this.bot.sendMessage(msg.chat.id, pumpItem.to_message(), {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                     })
                     await this.bot.sendMessage(msg.chat.id, `*Done*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                 }
             }
-
+            if(msg.text?.toLowerCase().startsWith('/set')) {
+                const args = msg.text.split(" ")
+                const numberOfTrades = this.readArgNumber(args[1], 0)
+                console.log(`Currently there are ${numberOfTrades} trades`)
+                this.numberOfTrades = numberOfTrades
+                await this.bot.sendMessage(msg.chat.id, `Currently there are *${numberOfTrades}* trades, pump will send at most *${this.maxAmountOfTradesToSend}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+            }            
       })
     }
 
