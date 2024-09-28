@@ -73,7 +73,9 @@ export class BotManager {
                 const numberOfTrades = this.readArgNumber(args[1], 0)
                 console.log(`SET Currently there are ${numberOfTrades} trades`)
                 this.numberOfTrades = numberOfTrades
-                await this.bot.sendMessage(msg.chat.id, `Currently there are *${numberOfTrades}* trades, scraper will send at most *${this.maxAmountOfTradesToSend}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                const responseMessage = await this.bot.sendMessage(msg.chat.id, `Currently there are *${numberOfTrades}* trades, scraper will send at most *${this.maxAmountOfTradesToSend}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                await this.bot.deleteMessage(msg.chat.id, responseMessage.message_id)
+                await this.bot.deleteMessage(msg.chat.id, msg.message_id)
             }            
             if(msg.text?.toLowerCase().startsWith('/get')) {
                 console.log(`GET Currently there are ${this.numberOfTrades} trades`)                
