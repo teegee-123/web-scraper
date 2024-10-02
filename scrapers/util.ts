@@ -26,4 +26,15 @@ export class Util {
         else convertedValue = parseFloat(val)        
         return convertedValue;
     }
+
+    static async fetchJsonValue(url: string) {
+        try{
+            const val = await fetch(url)
+            const res = await val.json()
+            return res;
+        } catch(error) {
+            console.log(error)
+            return []
+        }
+    }
 }

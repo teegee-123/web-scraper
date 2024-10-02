@@ -1,4 +1,4 @@
-import { Browser, Page } from "puppeteer";
+import { Browser, Page, PuppeteerLifeCycleEvent } from "puppeteer";
 import { Util } from "./util";
 export abstract class Scraper {
     page: Page;
@@ -11,9 +11,10 @@ export abstract class Scraper {
         this.initialize = async () => await this.init()
     }
 
+
     protected async init() {
         this.page = await this.browser.newPage();
-        await this.page.goto(this.url, {waitUntil: "domcontentloaded"});
+        await this.page.goto(this.url, {waitUntil: this.initWaitUntil()});
         await this.page.setViewport({ width: 1080, height: 1024 });
     }
 
@@ -21,6 +22,11 @@ export abstract class Scraper {
         let element = (await this.page.$(selector)) || "";
         return element !== ""
     }
+
+    protected initWaitUntil(): PuppeteerLifeCycleEvent {
+        return "domcontentloaded"
+    }
+
 
     public abstract scrape(params?: any);
     

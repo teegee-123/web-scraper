@@ -6,6 +6,7 @@ const PUPPETEER_EXECUTABLE_PATH = process.env.PUPPETEER_EXECUTABLE_PATH ?? puppe
 
 export class BrowserManager {
     browser: Browser;
+    static isBrowserScraping: {isScraping: boolean, runningTaskName: string} = {isScraping: false, runningTaskName: ''}
     constructor(){
       this.browser?.on('disconnected', () => {
         try { 
@@ -37,15 +38,16 @@ export class BrowserManager {
       }
     }
 
-    async tryScrape(scraper: Scraper, params: any = null){
+    async tryScrape(scraper: Scraper, params: any = null, taskName = 'default'){
       try{
-        if(!(await this.isBrowserRunning())) 
+        if(!(await this.isBrowserRunning()))
+          BrowserManager.isBrowserScraping = {isScraping: true, runningTaskName: taskName} 
           await this.launchBrowser();        
           return await scraper.scrape(params);
         } catch(e) {
           return `ERROR ${e}`
         } finally {
-          
+          BrowserManager.isBrowserScraping = {isScraping: false, runningTaskName: ''}
         }
     }
 }

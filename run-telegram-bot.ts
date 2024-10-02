@@ -2,6 +2,7 @@ import TelegramBot from "node-telegram-bot-api"
 import { PumpFunData } from "./scrapers/models"
 import { BrowserManager } from "./run-scraper"
 import { PumpFunScraper } from "./scrapers/pump-fun.scraper"
+import { MoonShotApiScraper } from "./scrapers/moon-shot.scraper"
 
 
 export class BotManager{
@@ -30,6 +31,11 @@ export class BotManager{
                 await this.bot.sendMessage(msg.chat.id, `*Done: *`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
             }
             if(msg.text?.toLowerCase().startsWith('/pump')) {
+                if(BrowserManager.isBrowserScraping.isScraping) {
+                    console.log("BUSY")
+                    await this.bot.sendMessage(msg.chat.id, `*Busy with ${BrowserManager.isBrowserScraping.runningTaskName}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                    return
+                }
                 // message is formatted as MAX_AGE MAX_MARKET_CAP MIN_REPLIES IS_LIVE
                 const args = msg.text.split(" ")
                 const params = {
@@ -53,7 +59,29 @@ export class BotManager{
                     await this.bot.sendMessage(msg.chat.id, `*Done*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
                 }
             }
+            if(msg.text?.toLowerCase().startsWith('/moon')) {
 
+                // message is formatted as MAX_AGE MAX_MARKET_CAP
+                const args = msg.text.split(" ")
+                const params = {
+                    MAX_AGE: this.readArgNumber(args[1], 600),
+                    MAX_MARKET_CAP: this.readArgNumber(args[2], 5000)
+                }
+                
+                try{                    
+                    const coinData = await new MoonShotApiScraper().scrape(params)                    
+                    coinData.forEach(async moonShotItem => {
+                        const item = (await moonShotItem)                                            
+                        if(item.marketCap <= params.MAX_MARKET_CAP && item.age <= params.MAX_AGE) {
+                            await this.bot.sendMessage(msg.chat.id, item.to_message(), {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' }) 
+                        }
+                    })
+                } catch(error) {
+                    await this.bot.sendMessage(msg.chat.id, `*ERROR* ${error}`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                } finally {
+                    await this.bot.sendMessage(msg.chat.id, `*Done*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+                }
+            }
       })
     }
 
@@ -64,3 +92,4 @@ export class BotManager{
         return parseInt(arg)
     }
 }
+

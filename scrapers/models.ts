@@ -25,3 +25,31 @@ export class PumpFunData implements ScraperData {
             *originalText*: ${this.originalText}`
     }   
 }
+
+
+export class MoonShotData implements ScraperData {
+    address: string;
+    pairId: string;
+    name: string;
+    age: number;
+    marketCap: number;
+    volume: number;
+    curveProgress: number;
+    readTime: Date;
+   
+
+
+    to_message() {
+        return `
+
+                *address*: \`${this.address}\`
+                *pairId*: \`${this.pairId}\`
+                *name*: ${this.name}
+                *age*: ${this.age}
+                *marketCap*: ${this.marketCap}
+                *volume*: ${this.volume}
+                *curveProgress*: ${this.curveProgress}
+                *readTime*: ${this.readTime}`
+
+    }   
+}
