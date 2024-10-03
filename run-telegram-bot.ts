@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api"
 import { PumpFunData } from "./scrapers/models"
 import { BrowserManager } from "./run-scraper"
 import { PumpFunScraper } from "./scrapers/pump-fun.scraper"
-
+require("dotenv").config();
 
 export class BotManager {
     bot: TelegramBot
@@ -80,6 +80,16 @@ export class BotManager {
             if(msg.text?.toLowerCase().startsWith('/get')) {
                 console.log(`GET Currently there are ${this.numberOfTrades} trades`)                
                 await this.bot.sendMessage(msg.chat.id, `Currently there are *${this.numberOfTrades}* trades, scraper will send at most *${this.maxAmountOfTradesToSend}*`, {reply_to_message_id: msg.message_id, parse_mode: 'Markdown' })
+            }  
+            if(msg.text?.includes(process.env.WALLET_ADDRESS)) {
+                try{
+                    const balanceString = msg.text.split("Main |")[1].split("\n")[0].replace("SOL", "").trim()                    
+                    const balance = parseFloat(balanceString)
+                    await this.bot.sendMessage(msg.chat.id, JSON.stringify({numTrades: this.numberOfTrades, balance: balance}))
+                    await this.bot.deleteMessage(msg.chat.id, msg.message_id)
+                } catch(e) {
+                    console.log('e', e)
+                }
             }            
 
       })
